@@ -4,8 +4,13 @@ const requireAuth = require("../middleware/requireAuth.js");
 const { Web3 } = require("web3");
 const NFT = require('../models/nftModel.js')
 const ERC721_ABI = require("../ABI/ERC_721.json")
+const dotenv = require("dotenv");
 
-const web3 = new Web3("https://sepolia.infura.io/v3/b46557a185ed44dcb2a9de6c1f8586b1");
+
+dotenv.config();
+
+
+const web3 = new Web3(`https://sepolia.infura.io/v3/${process.env.INFURA}`);
 
 router.post('/metadata', async (req, res) => {
     // console.log(req.params)
