@@ -3,6 +3,7 @@ pragma solidity ^0.8.8;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
 contract BasicNft is ERC721, Ownable {
     string public constant TOKEN_URI =
         "ipfs://bafkreicxa2o7utz6q3hs6uyerl5vmvkba2wzh7arktjfm3y4w2tnbtdzzm.ipfs.localhost:8080/?filename=nft.json";
