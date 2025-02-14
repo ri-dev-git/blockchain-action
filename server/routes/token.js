@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const router = express.Router();
 const requireAuth = require("../middleware/requireAuth.js");
 const { Web3 } = require("web3");
@@ -6,7 +7,6 @@ const Transaction = require('../models/transactionsSchema.js');
 const process = require("process");
 
 const dotenv = require("dotenv");
-
 
 dotenv.config();
 
@@ -20,14 +20,22 @@ const contractABI = require('../ABI/erc20.json'); // You should have the ABI JSO
 
 const tokenContract = new web3.eth.Contract(contractABI, contractAddress);
 
-const privateKey=process.env.PRIVATE_KEY
+const privateKey = process.env.PRIVATE_KEY;
+
+// Use CORS middleware globally
+router.use(cors({
+  origin: 'http://localhost:3000', // Allow requests from this origin
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}));
+
 // Apply requireAuth middleware to protect the transfer route
 router.post("/transfer", async (req, res) => {
   const { from, to, amount } = req.body;
 
   try {
     // Get the nonce (transaction count) for the from address
-    const nonce = await web3.eth.getTransactionCount(from, 'latest');
+    const nonce = await web3.eth.getTransactionCount(from, 'pending');
 
     // Estimate the gas limit for the transaction
     const gasLimit = await tokenContract.methods.transfer(to, web3.utils.toWei(amount, 'ether')).estimateGas({ from });

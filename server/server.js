@@ -7,14 +7,13 @@ const tokenController = require('./routes/token.js');
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-
 dotenv.config();
 
 const app = express();
 
 // configuration cors
 const corsOptions = {
-  origin: ["http://localhost:5173", "https://api.coingecko.com/"],
+  origin: [ "http://localhost:3000", "https://api.coingecko.com/"],
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
@@ -32,18 +31,16 @@ app.use((req, res, next) => {
 app.use("/api/nft", nftRoutes);
 app.use("/api/transfer-tokens", tokenController);
 
-
 //connect to db et lancement du server
 mongoose
   .connect(process.env.MONG_URI)
   .then(() => {
     // listen requests
     console.log(`connected to db`);
+    app.listen(process.env.PORT, () => {
+      console.log(`listening on port ${process.env.PORT}`);
+    });
   })
   .catch((error) => {
-    // console.log(error);
+    console.log(error);
   });
-
-app.listen(process.env.PORT, () => {
-  console.log(`listening on port ${process.env.PORT}`);
-});

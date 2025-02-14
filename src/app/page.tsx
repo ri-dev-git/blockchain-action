@@ -14,7 +14,7 @@ export default function Page() {
   useEffect(() => {
     if (isConnected && chainId === 11155111) {
       // Redirect to dashboard if connected and on Sepolia
-      router.push("/dashboard/nft-metadata");
+      router.push("/dashboard/nft-metadata/");
     }
   }, [isConnected, chainId, router]);
 
