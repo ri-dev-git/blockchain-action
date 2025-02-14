@@ -1,21 +1,26 @@
 const express = require("express");
+const cors = require("cors");
 const router = express.Router();
 const requireAuth = require("../middleware/requireAuth.js");
 const { Web3 } = require("web3");
-const NFT = require('../models/nftModel.js')
-const ERC721_ABI = require("../ABI/ERC_721.json")
+const NFT = require('../models/nftModel.js');
+const ERC721_ABI = require("../ABI/ERC_721.json");
 const dotenv = require("dotenv");
-
 
 dotenv.config();
 
-
 const web3 = new Web3(`https://sepolia.infura.io/v3/${process.env.INFURA}`);
 
+// Use CORS middleware globally
+router.use(cors({
+  origin: 'http://localhost:3000', // Allow requests from this origin
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}));
+
 router.post('/metadata', async (req, res) => {
-    // console.log(req.params)
     const { contractAddress, tokenId } = req.body;
-    console.log(contractAddress,tokenId)
+    console.log(contractAddress, tokenId);
 
     try {
         // Check if the NFT metadata is already in the database
@@ -50,4 +55,4 @@ router.post('/metadata', async (req, res) => {
     }
 });
 
-module.exports = router;    
+module.exports = router;
