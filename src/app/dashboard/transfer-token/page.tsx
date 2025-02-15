@@ -4,12 +4,12 @@ import { useState } from 'react';
 import axios from 'axios';
 
 export default function TransferTokenPage() {
-  const [fromAddress, setFromAddress] = useState('');
+  const [fromAddress] = useState('0x36E2dA3F27Eeb2a3f3B892BbaB63A9833459A9eE');
   const [toAddress, setToAddress] = useState('');
-  const [tokenAmount, setTokenAmount] = useState('');
+  const [tokenAmount] = useState('0.1');
   const [error, setError] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
-
+  const [loading, setLoading] = useState(false);
   const isValidEthereumAddress = (addr: string) => /^0x[a-fA-F0-9]{40}$/.test(addr);
 
   const handleSubmit = async () => {
@@ -23,12 +23,8 @@ export default function TransferTokenPage() {
       return;
     }
 
-    if (!/^[0-9]+(\.[0-9]+)?$/.test(tokenAmount) || parseFloat(tokenAmount) <= 0) {
-      setError('Invalid amount. Please enter a positive number.');
-      return;
-    }
-
     setError('');
+    setLoading(true);
     try {
       const response = await axios.post('https://blockchain-actionver.onrender.com/api/transfer-tokens/transfer', {
         from: fromAddress,
@@ -43,6 +39,8 @@ export default function TransferTokenPage() {
     } catch (error) {
       console.error('Error transferring token:', error);
       setError('Transaction failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,7 +50,7 @@ export default function TransferTokenPage() {
 
       <p className="mt-4 text-gray-700">
         Use the form below to transfer tokens between Ethereum addresses. Ensure that the addresses are valid and the amount is a positive number.
-      
+        Token Address:0x7f4211C8870568d6e1D12A30C1b53863Ff888dbd
         <br /><br />
         Upon submission, the application will:
         <br />
@@ -71,13 +69,7 @@ export default function TransferTokenPage() {
 
         <div className="flex flex-col">
           <span className="font-medium mb-1">From:</span>
-          <input
-            type="text"
-            value={fromAddress}
-            onChange={(e) => setFromAddress(e.target.value)}
-            placeholder="Enter sender address"
-            className="border p-2 w-full"
-          />
+          <span>0x36E2dA3F27Eeb2a3f3B892BbaB63A9833459A9eE</span>
         </div>
 
         <div className="flex flex-col">
@@ -93,22 +85,22 @@ export default function TransferTokenPage() {
 
         <div className="flex flex-col">
           <span className="font-medium mb-1">Amount:</span>
-          <input
-            type="text"
-            value={tokenAmount}
-            onChange={(e) => setTokenAmount(e.target.value)}
-            placeholder="Enter token amount"
-            className="border p-2 w-full"
-          />
+          <span>0.1 SMTK</span>
         </div>
 
         <div className="flex justify-center">
-          <button
-            className="mt-4 p-2 bg-green-500 text-white rounded hover:bg-green-600"
+          {loading ? <button
+            className={"bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed Pointer-events-none"}
+          >
+            Transferring...
+          </button>
+          :  <button
+            className={"mt-4 p-2 bg-green-500 text-white rounded hover:bg-green-600"}
             onClick={handleSubmit}
           >
             Submit
-          </button>
+          </button>}
+          
         </div>
       </div>
     </div>
