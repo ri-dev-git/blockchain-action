@@ -33,12 +33,18 @@ export default function Page() {
       <h1 className="text-4xl font-bold mb-4">Welcome to Blockchain Actions</h1>
 
       {!isConnected ? (
-        <div>
+        <div style={{display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center", textAlign: "center" }}>
           <p className="mb-4">Please connect your wallet to continue.</p>
           <ConnectButton />
         </div>
       ) : chainId !== 11155111 ? (
-        <div>
+        <div style={{ display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",textAlign: "center" }}>
           <p className="mb-4">
             You are not on the Sepolia testnet. Please switch to Sepolia.
           </p>

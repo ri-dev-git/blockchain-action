@@ -5,8 +5,10 @@ import axios from 'axios';
 
 export default function NFTMetadataPage() {
   const [metadata, setMetadata] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchMetadata = async () => {
+    setLoading(true);
     try {
       const response = await axios.post('https://blockchain-actionver.onrender.com/api/nft/metadata', {
         contractAddress: '0x218d821bB23Ca1269F0e1A9A5f35394c1714D960',
@@ -19,6 +21,8 @@ export default function NFTMetadataPage() {
       setMetadata(response.data);
     } catch (error) {
       console.error('Error fetching metadata:', error);
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -41,11 +45,11 @@ export default function NFTMetadataPage() {
           <span>1</span>
         </div>
         <button onClick={fetchMetadata} className="mt-4 p-2 bg-green-500 text-white rounded hover:bg-green-600">
-          Get -&gt;
+        {loading ? 'Loading...' : 'Get ->'}
         </button>
       </div>
 
-      <div className="border border-indigo-600">
+      <div className="">
         {metadata && (
           <div className="mt-8">
             <h3 className="text-xl font-bold">Metadata:</h3>

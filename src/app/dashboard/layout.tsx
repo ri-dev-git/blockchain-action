@@ -1,13 +1,27 @@
 'use client';
 
-import { useAccount } from 'wagmi';
+import { useAccount, useDisconnect } from 'wagmi';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname,useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
   const pathname = usePathname();
+  const router = useRouter();
+  const [connectedAddress, setConnectedAddress] = useState(address);
 
+
+  useEffect(() => {
+    setConnectedAddress(address);
+  }, [address]);
+
+
+  const handleLogout = () => {
+    disconnect();
+    router.push('/');
+  };
   return (
     <div className="flex-col h-screen w-screen bg-gray-100">
       {/* Top Bar */}
@@ -40,7 +54,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Link>
           </nav>
 
-          <button className="p-4 text-lg font-medium bg-red-500 text-white mt-auto hover:bg-red-600">
+          <button 
+            className="p-4 text-lg font-medium bg-red-500 text-white mt-auto hover:bg-red-600"
+            onClick={handleLogout}
+          >
             Logout
           </button>
         </div>
