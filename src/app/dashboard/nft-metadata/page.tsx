@@ -8,7 +8,7 @@ export default function NFTMetadataPage() {
 
   const fetchMetadata = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/nft/metadata', {
+      const response = await axios.post('https://blockchain-actionver.onrender.com/api/nft/metadata', {
         contractAddress: '0x218d821bB23Ca1269F0e1A9A5f35394c1714D960',
         tokenId: '1',
       }, {
