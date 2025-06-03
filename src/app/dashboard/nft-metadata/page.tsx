@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import axios from 'axios';
 
 export default function NFTMetadataPage() {
   const [metadata, setMetadata] = useState<any>(null);
@@ -11,26 +10,63 @@ export default function NFTMetadataPage() {
   const fetchMetadata = async () => {
     setLoading(true);
     setError(null);
+    
     try {
-      const response = await axios.post('https://blockchain-actionver.onrender.com/api/nft/metadata', {
-        contractAddress: '0x218d821bB23Ca1269F0e1A9A5f35394c1714D960',
-        tokenId: '1',
-      }, {
+      // Using fetch instead of axios to avoid additional dependencies
+      const response = await fetch('https://blockchain-actionver.onrender.com/api/nft/metadata', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // Add additional headers that might help with CORS
+          'Accept': 'application/json',
         },
+        body: JSON.stringify({
+          contractAddress: '0x218d821bB23Ca1269F0e1A9A5f35394c1714D960',
+          tokenId: '1',
+        }),
+        // Add mode and credentials for better CORS handling
+        mode: 'cors',
+        credentials: 'omit',
       });
-      setMetadata(response.data);
-    } catch (error) {
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setMetadata(data);
+    } catch (error: any) {
       console.error('Error fetching metadata:', error);
-      setError('Failed to fetch NFT metadata. Please try again.');
+      
+      // More detailed error handling
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        setError('Network error: Unable to connect to the server. This might be a CORS issue or the server might be down.');
+      } else if (error.message.includes('CORS')) {
+        setError('CORS error: The server needs to allow requests from this domain.');
+      } else {
+        setError(`Failed to fetch NFT metadata: ${error.message || 'Unknown error'}`);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      // Could add a toast notification here
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+    }
   };
 
   return (
@@ -43,6 +79,19 @@ export default function NFTMetadataPage() {
         <p className="text-sm sm:text-base text-gray-600 mt-2">
           Retrieve metadata from Ethereum NFT contracts
         </p>
+      </div>
+
+      {/* CORS Information Section */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 sm:p-6 mb-6">
+        <h3 className="text-lg sm:text-xl font-semibold text-yellow-900 mb-3">
+          🔧 CORS & Network Issues Solutions
+        </h3>
+        <div className="text-sm sm:text-base text-yellow-800 space-y-2">
+          <p><strong>If you encounter CORS errors:</strong></p>
+          <ul className="list-disc list-inside space-y-1 ml-4">
+            <li>Download a CORs extension on your browser and enable it and run the fetch again. </li>
+          </ul>
+        </div>
       </div>
 
       {/* Description Section */}
@@ -135,15 +184,26 @@ export default function NFTMetadataPage() {
       {/* Error Display */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <div className="flex items-center gap-2">
-            <span className="text-red-500 text-lg">⚠️</span>
-            <p className="text-red-800 text-sm sm:text-base font-medium">
-              Error
-            </p>
+          <div className="flex items-start gap-2">
+            <span className="text-red-500 text-lg mt-0.5">⚠️</span>
+            <div className="flex-1">
+              <p className="text-red-800 text-sm sm:text-base font-medium">
+                Error
+              </p>
+              <p className="text-red-700 text-sm sm:text-base mt-1">
+                {error}
+              </p>
+              <div className="mt-3 text-xs sm:text-sm text-red-600">
+                <p><strong>Troubleshooting Tips:</strong></p>
+                <ul className="list-disc list-inside mt-1 space-y-1">
+                  <li>Check if the server is running and accessible</li>
+                  <li>Verify the API endpoint URL is correct</li>
+                  <li>Check browser console for additional error details</li>
+                  <li>Ensure the server has proper CORS headers configured</li>
+                </ul>
+              </div>
+            </div>
           </div>
-          <p className="text-red-700 text-sm sm:text-base mt-1">
-            {error}
-          </p>
         </div>
       )}
 
